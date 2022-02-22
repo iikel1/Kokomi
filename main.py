@@ -21,7 +21,7 @@ mycol2 = mydb["accounts"]
 
 @client.event
 async def on_ready():
-    print("[-] Ready")
+    print("[-] Ready as {}".format(client.user))
 
 
 @client.event
@@ -31,15 +31,49 @@ async def on_message(message):
     elif message.author.id == 942127864248156211 : 
         return
     else :
-        print(message.author.id)
+        
         await updatedata(message.author.id)
         coinlist = random.choice([0, 2, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0, 0, 0, 0])
         await add_coins(message.author.id, coinlist)
         await client.process_commands(message)
 
+
+
 @client.command()
-async def clear(ctx):
-	await ctx.send("hello")
+async def shop(ctx):
+    await updatedata(ctx.author.id)
+    embed = discord.Embed(title='Ko Shop', description='Pet.\n<:Fish:942440582922518568> Fish - 550 <:SweetCake:942902488225443890>')
+    embed.set_footer(text='use k?buy to buy itmes')
+    await ctx.send(embed=embed)
+
+# @client.command()
+# async def buy(ctx, args):
+#     if args == 'fish' :
+#         Pet = 'Fish'
+
+#     find = {"_id": f"{ctx.author.id}"}
+#     x = mycol.find_one(find)
+
+
+@client.command()
+async def flip(ctx, args):
+    await updatedata(ctx.author.id)
+    find = {"_id": f"{ctx.author.id}"}
+    x = mycol.find_one(find)
+    ran = random.randint(1, 2)
+    if ran == 1 :
+        wincoins = x['coins'] + (int(args) * 2)
+        newcoins = {"$set": { "coins": wincoins } }
+        mycol.update_one(find, newcoins)
+        embed = discord.Embed(title='Congrats <:KokomiWin:945760725740183572>', description=f'You won {int(args) * 2} <:SweetCake:942902488225443890>', color=0xd4f1f9)
+        await ctx.send(embed=embed)
+    else :
+        losecoins = x['coins'] - (int(args))
+        newcoins = {"$set": { "coins": losecoins } }
+        mycol.update_one(find, newcoins)
+        embed = discord.Embed(title='Sad <:kokomiSad:945764630947561482>', description=f'You Lost {int(args)} <:SweetCake:942902488225443890>', color=0xd4f1f9)
+
+
 
 
     
